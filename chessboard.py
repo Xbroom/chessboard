@@ -11,7 +11,6 @@ class Board(QWidget):
 
     def __init__(self, parent=None):
         super(Board, self).__init__(parent)
-        self.backgroundPixmap = QPixmap("resources/background.png")
         self.margin = 0.1
         self.padding = 0.06
         self.showCoordinates = True
@@ -26,7 +25,7 @@ class Board(QWidget):
         painter.begin(self)
 
         # Draw the background.
-        backgroundBrush = QBrush(Qt.red, self.backgroundPixmap)
+        backgroundBrush = QBrush(Qt.red, QPixmap("resources/background.png"))
         backgroundBrush.setStyle(Qt.TexturePattern)
         painter.fillRect(QRect(QPoint(0, 0), self.size()), backgroundBrush)
 
@@ -64,6 +63,16 @@ class Board(QWidget):
         painter.setPen(QPen(QBrush(self.borderColor.lighter()), self.shadowWidth))
         painter.drawLine(squareSize * 8, 0, squareSize * 8, squareSize * 8)
         painter.drawLine(0, squareSize * 8, squareSize * 8, squareSize * 8)
+
+        # Display coordinates.
+        if self.showCoordinates:
+            font = QFont()
+            font.setPixelSize(min(borderSize, squareSize) * 0.6)
+            painter.setFont(font)
+            for i, rank in enumerate(["8", "7", "6", "5", "4", "3", "2", "1"]):
+                painter.drawText(QRect(-borderSize, squareSize * i, borderSize, squareSize), Qt.AlignCenter, rank)
+            for i, file in enumerate(["a", "b", "c", "d", "e", "f", "g", "h"]):
+                painter.drawText(QRect(squareSize * i, squareSize * 8, squareSize, borderSize), Qt.AlignCenter, file)
 
         painter.end()
 

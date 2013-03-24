@@ -10,7 +10,7 @@ class Board(QWidget):
     def __init__(self, parent=None):
         super(Board, self).__init__(parent)
         self.backgroundPixmap = QPixmap("resources/background.png")
-        self.margin = 10
+        self.margin = 50
         self.padding = 10
         self.showCoordinates = True
         self.lightSquareColor = QColor(255, 255, 255)
@@ -44,7 +44,7 @@ class Board(QWidget):
         painter.drawLine(0, frameSize, frameSize, frameSize)
 
         # Draw the squares.
-        painter.translate(self.margin, self.margin)
+        painter.translate(self.padding, self.padding)
         squareSize = (frameSize - 2 * self.padding) / 8.0
         for x in range(0, 8):
             for y in range(0, 8):
@@ -53,6 +53,15 @@ class Board(QWidget):
                      painter.fillRect(rect, QBrush(self.lightSquareColor))
                 else:
                      painter.fillRect(rect, QBrush(self.darkSquareColor))
+
+        # Draw the inset.
+        painter.setPen(QPen(QBrush(self.borderColor.darker()), self.shadowWidth))
+        painter.drawLine(0, 0, 0, squareSize * 8)
+        painter.drawLine(0, 0, squareSize * 8, 0)
+        painter.setPen(QPen(QBrush(self.borderColor.lighter()), self.shadowWidth))
+        painter.drawLine(squareSize * 8, 0, squareSize * 8, squareSize * 8)
+        painter.drawLine(0, squareSize * 8, squareSize * 8, squareSize * 8)
+
 
         painter.end()
 

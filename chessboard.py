@@ -6,7 +6,7 @@ import math
 
 from PySide.QtCore import *
 from PySide.QtGui import *
-
+from PySide.QtSvg import *
 
 class Board(QWidget):
 
@@ -20,6 +20,8 @@ class Board(QWidget):
         self.borderColor = QColor(100, 100, 200)
         self.shadowWidth = 2
         self.rotation = 0
+        self.renderer = renderer = QSvgRenderer("resources/classic-pieces/black-king.svg")
+        self.backgroundPixmap = QPixmap("resources/background.png")
 
     def mousePressEvent(self, e):
         self.rotation += 20
@@ -38,7 +40,7 @@ class Board(QWidget):
             darkBorderColor = self.borderColor.lighter()
 
         # Draw the background.
-        backgroundBrush = QBrush(Qt.red, QPixmap("resources/background.png"))
+        backgroundBrush = QBrush(Qt.red, self.backgroundPixmap)
         backgroundBrush.setStyle(Qt.TexturePattern)
         painter.fillRect(QRect(QPoint(0, 0), self.size()), backgroundBrush)
 
@@ -97,6 +99,15 @@ class Board(QWidget):
                 painter.translate(pos.x(), pos.y())
                 painter.rotate(-self.rotation)
                 painter.drawText(QRect(-coordinateSize / 2, -coordinateSize / 2, coordinateSize, coordinateSize), Qt.AlignCenter, file)
+                painter.restore()
+
+        # Draw pieces.
+        for x in range(0, 8):
+            for y in range(0, 8):
+                painter.save()
+                painter.translate((x + 0.5) * squareSize, (y + 0.5) * squareSize)
+                painter.rotate(-self.rotation)
+                self.renderer.render(painter, QRect(-squareSize / 2, -squareSize / 2, squareSize, squareSize))
                 painter.restore()
 
         painter.end()

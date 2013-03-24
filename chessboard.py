@@ -18,7 +18,7 @@ class Board(QWidget):
         self.darkSquareColor = QColor(100, 100, 255)
         self.borderColor = QColor(100, 100, 200)
         self.shadowWidth = 2
-        self.rotation = 0
+        self.rotation = 180
 
     def paintEvent(self, event):
         painter = QPainter()
@@ -66,13 +66,25 @@ class Board(QWidget):
 
         # Display coordinates.
         if self.showCoordinates:
+            painter.setPen(QPen(QBrush(self.borderColor.lighter()), self.shadowWidth))
+            coordinateSize = min(borderSize, squareSize)
             font = QFont()
-            font.setPixelSize(min(borderSize, squareSize) * 0.6)
+            font.setPixelSize(coordinateSize * 0.6)
             painter.setFont(font)
             for i, rank in enumerate(["8", "7", "6", "5", "4", "3", "2", "1"]):
-                painter.drawText(QRect(-borderSize, squareSize * i, borderSize, squareSize), Qt.AlignCenter, rank)
+                pos = QRect(-borderSize, squareSize * i, borderSize, squareSize).center()
+                painter.save()
+                painter.translate(pos.x(), pos.y())
+                painter.rotate(-self.rotation)
+                painter.drawText(QRect(-coordinateSize / 2, -coordinateSize / 2, coordinateSize, coordinateSize), Qt.AlignCenter, rank)
+                painter.restore()
             for i, file in enumerate(["a", "b", "c", "d", "e", "f", "g", "h"]):
-                painter.drawText(QRect(squareSize * i, squareSize * 8, squareSize, borderSize), Qt.AlignCenter, file)
+                pos = QRect(squareSize * i, squareSize * 8, squareSize, borderSize).center()
+                painter.save()
+                painter.translate(pos.x(), pos.y())
+                painter.rotate(-self.rotation)
+                painter.drawText(QRect(-coordinateSize / 2, -coordinateSize / 2, coordinateSize, coordinateSize), Qt.AlignCenter, file)
+                painter.restore()
 
         painter.end()
 

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import math
 
 from PySide.QtCore import *
 from PySide.QtGui import *
@@ -18,11 +19,23 @@ class Board(QWidget):
         self.darkSquareColor = QColor(100, 100, 255)
         self.borderColor = QColor(100, 100, 200)
         self.shadowWidth = 2
-        self.rotation = 180
+        self.rotation = 0
+
+    def mousePressEvent(self, e):
+        self.rotation += 20
+        self.repaint()
 
     def paintEvent(self, event):
         painter = QPainter()
         painter.begin(self)
+
+        # Light shines from upper left.
+        if math.cos(math.radians(self.rotation)) >= 0:
+            lightBorderColor = self.borderColor.lighter()
+            darkBorderColor = self.borderColor.darker()
+        else:
+            lightBorderColor = self.borderColor.darker()
+            darkBorderColor = self.borderColor.lighter()
 
         # Draw the background.
         backgroundBrush = QBrush(Qt.red, QPixmap("resources/background.png"))
@@ -38,10 +51,10 @@ class Board(QWidget):
         borderSize = min(self.width(), self.height()) * self.padding
         painter.translate(-frameSize / 2, -frameSize / 2)
         painter.fillRect(QRect(0, 0, frameSize, frameSize), self.borderColor)
-        painter.setPen(QPen(QBrush(self.borderColor.lighter()), self.shadowWidth))
+        painter.setPen(QPen(QBrush(lightBorderColor), self.shadowWidth))
         painter.drawLine(0, 0, 0, frameSize)
         painter.drawLine(0, 0, frameSize, 0)
-        painter.setPen(QPen(QBrush(self.borderColor.darker()), self.shadowWidth))
+        painter.setPen(QPen(QBrush(darkBorderColor), self.shadowWidth))
         painter.drawLine(frameSize, 0, frameSize, frameSize)
         painter.drawLine(0, frameSize, frameSize, frameSize)
 
@@ -57,10 +70,10 @@ class Board(QWidget):
                      painter.fillRect(rect, QBrush(self.darkSquareColor))
 
         # Draw the inset.
-        painter.setPen(QPen(QBrush(self.borderColor.darker()), self.shadowWidth))
+        painter.setPen(QPen(QBrush(darkBorderColor), self.shadowWidth))
         painter.drawLine(0, 0, 0, squareSize * 8)
         painter.drawLine(0, 0, squareSize * 8, 0)
-        painter.setPen(QPen(QBrush(self.borderColor.lighter()), self.shadowWidth))
+        painter.setPen(QPen(QBrush(lightBorderColor), self.shadowWidth))
         painter.drawLine(squareSize * 8, 0, squareSize * 8, squareSize * 8)
         painter.drawLine(0, squareSize * 8, squareSize * 8, squareSize * 8)
 

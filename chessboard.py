@@ -6,18 +6,20 @@ import sys
 from PySide.QtCore import *
 from PySide.QtGui import *
 
+
 class Board(QWidget):
+
     def __init__(self, parent=None):
         super(Board, self).__init__(parent)
         self.backgroundPixmap = QPixmap("resources/background.png")
-        self.margin = 50
-        self.padding = 10
+        self.margin = 0.1
+        self.padding = 0.06
         self.showCoordinates = True
         self.lightSquareColor = QColor(255, 255, 255)
         self.darkSquareColor = QColor(100, 100, 255)
         self.borderColor = QColor(100, 100, 200)
         self.shadowWidth = 2
-        self.rotation = 20
+        self.rotation = 0
 
     def paintEvent(self, event):
         painter = QPainter()
@@ -33,7 +35,8 @@ class Board(QWidget):
         painter.rotate(self.rotation)
 
         # Draw the border.
-        frameSize = min(self.width(), self.height()) - self.margin * 2
+        frameSize = min(self.width(), self.height()) * (1 - self.margin * 2)
+        borderSize = min(self.width(), self.height()) * self.padding
         painter.translate(-frameSize / 2, -frameSize / 2)
         painter.fillRect(QRect(0, 0, frameSize, frameSize), self.borderColor)
         painter.setPen(QPen(QBrush(self.borderColor.lighter()), self.shadowWidth))
@@ -44,8 +47,8 @@ class Board(QWidget):
         painter.drawLine(0, frameSize, frameSize, frameSize)
 
         # Draw the squares.
-        painter.translate(self.padding, self.padding)
-        squareSize = (frameSize - 2 * self.padding) / 8.0
+        painter.translate(borderSize, borderSize)
+        squareSize = (frameSize - 2 * borderSize) / 8.0
         for x in range(0, 8):
             for y in range(0, 8):
                 rect = QRect(x * squareSize, y * squareSize, squareSize, squareSize)
@@ -62,8 +65,8 @@ class Board(QWidget):
         painter.drawLine(squareSize * 8, 0, squareSize * 8, squareSize * 8)
         painter.drawLine(0, squareSize * 8, squareSize * 8, squareSize * 8)
 
-
         painter.end()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

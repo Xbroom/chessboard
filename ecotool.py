@@ -31,12 +31,26 @@ if __name__ == "__main__":
         parser.error("no input file given")
 
     # Read the input files.
-    eco_parser = chess.EcoFileParser()
+    eco_parser = chess.EcoFileParser(options.classification != os.devnull, options.lookup != os.devnull)
     for arg in args:
+        # Tokenize.
         eco_parser.tokenize(arg)
-        while eco_parser.has_more():
+        if not options.quiet:
+            print "Tokenized %s." % arg
+
+        chunks = 0
+        total = len(eco_parser.chunks)
+        while eco_parser.chunks:
+            # Parse another chunk.
             eco_parser.read_chunk()
-            if eco_parser.current_state == chess.EcoFileParser.ECO_STATE and not options.quiet:
+
+            # Report progress.
+            chunks += 1
+            if chunks % 1000 == 0 and not options.quiet:
+                print "Parsed %d / %d chunks." % (chunks, total)
+
+            # Report current ECO code.
+            if eco_parser.current_state == chess.EcoFileParser.ECO_STATE and not options.quiet and eco_parser.current_eco:
                 print eco_parser.current_eco, eco_parser.current_name
 
     # Write output.

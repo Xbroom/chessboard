@@ -2133,16 +2133,16 @@ class EcoFileParser(object):
     NAME_STATE = 1
     MOVETEXT_STATE = 2
 
-    def __init__(self):
-        self.classification = dict()
-        self.lookup = dict()
+    def __init__(self, create_classification=True, create_lookup=True):
+        self.classification = dict() if create_classification else None
+        self.lookup = dict() if create_lookup else None
 
         self.current_state = EcoFileParser.ECO_STATE
         self.current_eco = None
         self.current_name = None
         self.current_position = None
 
-        self.__chunks = []
+        self.chunks = []
 
     def tokenize(self, filename):
         handle = open(filename, "r")
@@ -2151,10 +2151,13 @@ class EcoFileParser(object):
             if not line or line.startswith("#"):
                 continue
 
-            self.__chunks += line.split()
+            self.chunks += line.split()
 
     def read_chunk(self):
-        chunk = self.__chunks.pop(0)
+        chunk = self.chunks.pop(0)
+
+        if self.classification is None and self.lookup is None:
+            return
 
         if self.current_state == EcoFileParser.ECO_STATE:
             self.current_eco = chunk[0:3]
@@ -2171,24 +2174,23 @@ class EcoFileParser(object):
         elif self.current_state == EcoFileParser.MOVETEXT_STATE:
             if chunk == "*":
                 self.current_state = EcoFileParser.ECO_STATE
-                self.classification[hash(self.current_position)] = {
-                    "eco": self.current_eco,
-                    "name": self.current_name,
-                    "fen": self.current_position.fen,
-                }
-                if not self.current_eco in self.lookup:
+                if not self.classification is None:
+                    self.classification[hash(self.current_position)] = {
+                        "eco": self.current_eco,
+                        "name": self.current_name,
+                        "fen": self.current_position.fen,
+                    }
+                if not self.lookup is None and not self.current_eco in self.lookup:
                     self.lookup[self.current_eco] = {
                         "name": self.current_name,
                         "fen": self.current_position.fen,
                     }
             else:
-                match = EcoFileParser.__move_regex.match(chunk)
-                self.current_position.make_move(self.current_position.get_move_from_san(match.group(2)))
-
-    def has_more(self):
-        return bool(self.__chunks)
+                if self.classification is not None or not self.current_eco in self.lookup:
+                    match = EcoFileParser.__move_regex.match(chunk)
+                    self.current_position.make_move(self.current_position.get_move_from_san(match.group(2)))
 
     def read_all(self):
-        while self.has_more():
+        while self.chunks:
             self.read_chunk()
         assert self.current_state == EcoFileParser.ECO_STATE

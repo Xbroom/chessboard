@@ -2048,7 +2048,7 @@ class GameHeaderBag(collections.MutableMapping):
 
 class PgnDatabaseReader(object):
 
-    __tag_regex = tag_regex = re.compile(r"\[([A-Za-z0-9]+)\s+\"(.*)\"\]")
+    __tag_regex = re.compile(r"\[([A-Za-z0-9]+)\s+\"(.*)\"\]")
 
     def __init__(self, filename, read_movetexts=False):
         self.__read_movetexts = read_movetexts
@@ -2057,8 +2057,8 @@ class PgnDatabaseReader(object):
         self.__scanned = 0
         self.__size = os.path.getsize(filename)
         self.__done = False
-        self.__games = []
-        self.__movetexts = []
+        self.games = []
+        self.movetexts = []
 
         self.__current_game = None
         self.__in_tags = False
@@ -2076,14 +2076,6 @@ class PgnDatabaseReader(object):
     def done(self):
         return self.__done
 
-    @property
-    def games(self):
-        return tuple(self.__games)
-
-    @property
-    def movetexts(self):
-        return tuple(self.__movetexts)
-
     def read(self):
         # Check if already done.
         if self.__done:
@@ -2093,8 +2085,8 @@ class PgnDatabaseReader(object):
         line = self.__handle.readline()
         if line == "":
             if self.__current_game:
-                self.__games.append(self.__current_game)
-                self.__movetexts.append(self.__movetext)
+                self.games.append(self.__current_game)
+                self.movetexts.append(self.__movetext)
             self.__done = True
             return
 
@@ -2112,7 +2104,7 @@ class PgnDatabaseReader(object):
                 if self.__in_tags:
                     self.__current_game[tag_name] = tag_value
                 else:
-                    self.__games.append(self.__current_game)
+                    self.games.append(self.__current_game)
                     self.__movetexts.append(self.__movetext)
                     self.__current_game = None
             if not self.__current_game:
@@ -2131,3 +2123,72 @@ class PgnDatabaseReader(object):
     def read_all(self):
         while not self.__done:
             self.read()
+
+
+class EcoFileParser(object):
+
+    __move_regex = re.compile(r"([0-9]+\.)?(.*)")
+
+    ECO_STATE = 0
+    NAME_STATE = 1
+    MOVETEXT_STATE = 2
+
+    def __init__(self):
+        self.classification = dict()
+        self.lookup = dict()
+
+        self.current_state = EcoFileParser.ECO_STATE
+        self.current_eco = None
+        self.current_name = None
+        self.current_position = None
+
+        self.__chunks = []
+
+    def tokenize(self, filename):
+        handle = open(filename, "r")
+        for line in handle:
+            line = line.strip().decode("latin-1")
+            if not line or line.startswith("#"):
+                continue
+
+            self.__chunks += line.split()
+
+    def read_chunk(self):
+        chunk = self.__chunks.pop(0)
+
+        if self.current_state == EcoFileParser.ECO_STATE:
+            self.current_eco = chunk[0:3]
+            self.current_name = ""
+            self.current_position = Position()
+            self.current_state = EcoFileParser.NAME_STATE
+        elif self.current_state == EcoFileParser.NAME_STATE:
+            if chunk.startswith("\""):
+                chunk = chunk[1:]
+            if chunk.endswith("\""):
+                chunk = chunk[:-1]
+                self.current_state = EcoFileParser.MOVETEXT_STATE
+            self.current_name = (self.current_name + " " + chunk).strip()
+        elif self.current_state == EcoFileParser.MOVETEXT_STATE:
+            if chunk == "*":
+                self.current_state = EcoFileParser.ECO_STATE
+                self.classification[hash(self.current_position)] = {
+                    "eco": self.current_eco,
+                    "name": self.current_name,
+                    "fen": self.current_position.fen,
+                }
+                if not self.current_eco in self.lookup:
+                    self.lookup[self.current_eco] = {
+                        "name": self.current_name,
+                        "fen": self.current_position.fen,
+                    }
+            else:
+                match = EcoFileParser.__move_regex.match(chunk)
+                self.current_position.make_move(self.current_position.get_move_from_san(match.group(2)))
+
+    def has_more(self):
+        return bool(self.__chunks)
+
+    def read_all(self):
+        while self.has_more():
+            self.read_chunk()
+        assert self.current_state == EcoFileParser.ECO_STATE

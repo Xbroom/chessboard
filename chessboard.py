@@ -3,12 +3,33 @@
 
 import sys
 import math
+import locale
+import gettext
 
 from PySide.QtCore import *
 from PySide.QtGui import *
 from PySide.QtSvg import *
 
 import chess
+
+
+class ChessboardApplication(QApplication):
+
+    def __init__(self, args):
+        super(ChessboardApplication, self).__init__(args)
+        self.initLocale()
+
+    def initLocale(self):
+        locale.setlocale(locale.LC_ALL, "")
+        loc = locale.getlocale()
+
+        try:
+            filename = "locale/%s.mo" % locale.getlocale()[0][0:2]
+            trans = gettext.GNUTranslations(open(filename, "rb"))
+        except IOError:
+            trans = gettext.NullTranslations()
+
+        trans.install()
 
 
 class Board(QWidget):
@@ -192,10 +213,60 @@ class Board(QWidget):
                 assert not move.promotion # TODO: Allow promotions.
                 return move
 
+
+class PromotionDialog(QDialog):
+
+    def __init__(self, color, parent=None):
+        super(PromotionDialog, self).__init__(parent)
+
+        self.promotionTypes = ["q", "n", "r", "b"]
+
+        grid = QGridLayout()
+        hbox = QHBoxLayout()
+        grid.addLayout(hbox, 0, 0)
+
+        # Add the piece buttons.
+        self.buttonGroup = QButtonGroup(self)
+        for i, promotionType in enumerate(self.promotionTypes):
+            # Create an icon for the piece.
+            piece = chess.Piece.from_color_and_type(color, promotionType)
+            renderer = QSvgRenderer("resources/classic-pieces/%s-%s.svg" % (piece.full_color, piece.full_type))
+            pixmap = QPixmap(32, 32)
+            pixmap.fill(Qt.transparent)
+            painter = QPainter()
+            painter.begin(pixmap)
+            renderer.render(painter, QRect(0, 0, 32, 32))
+            painter.end()
+
+            # Add the button.
+            button = QPushButton(QIcon(pixmap), _(piece.full_type), self)
+            button.setCheckable(True)
+            self.buttonGroup.addButton(button, i)
+            hbox.addWidget(button)
+
+        self.buttonGroup.button(0).setChecked(True)
+
+        # Add the ok and cancel buttons.
+        buttons = QDialogButtonBox(QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
+        buttons.rejected.connect(self.reject)
+        buttons.accepted.connect(self.accept)
+        grid.addWidget(buttons, 1, 0)
+
+        self.setLayout(grid)
+        self.setWindowTitle(_("Promotion"))
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+
+    def selectedType(self):
+        return self.promotionTypes[self.buttonGroup.checkedId()]
+
+
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
+    app = ChessboardApplication(sys.argv)
 
     board = Board()
     board.show()
+
+    d = PromotionDialog("w")
+    d.show()
 
     app.exec_()

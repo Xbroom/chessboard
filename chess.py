@@ -2183,7 +2183,8 @@ class EcoFileParser(object):
             else:
                 if self.classification is not None or not self.current_eco in self.lookup:
                     match = EcoFileParser.__move_regex.match(chunk)
-                    self.current_position.make_move(self.current_position.get_move_from_san(match.group(2)))
+                    if match.group(2):
+                        self.current_position.make_move(self.current_position.get_move_from_san(match.group(2)))
 
     def read_all(self):
         while self.chunks:

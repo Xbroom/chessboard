@@ -9,10 +9,9 @@ import os
 
 if __name__ == "__main__":
     # Parse command line arguments.
-    parser = optparse.OptionParser("usage: %prog [OUTPUT OPTIONS] [INPUT FILE]")
+    usage = "usage: %prog [OUTPUT OPTIONS] [INPUT FILE]"
     description = """\
                   This script converts ECO opening databases into JSON files.
-
                   You can create a classification table showing ECO codes keyed
                   by position.
                   You can also create a lookup table showing position and name

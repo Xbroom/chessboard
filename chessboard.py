@@ -10,7 +10,14 @@ from PySide.QtSvg import *
 
 import chess
 
+
 class Board(QWidget):
+
+    squareDragStart = Signal(chess.Square)
+
+    squareDragDrop = Signal(chess.Square, chess.Square)
+
+    squareClicked = Signal(chess.Square)
 
     def __init__(self, parent=None):
         super(Board, self).__init__(parent)
@@ -24,6 +31,9 @@ class Board(QWidget):
         self.rotation = 0
         self.backgroundPixmap = QPixmap("resources/background.png")
 
+        self.draggedSquare = None
+        self.dragPosition = None
+
         self.position = chess.Position()
         self.position.make_move(chess.Move.from_uci("e2e4"))
 
@@ -34,8 +44,23 @@ class Board(QWidget):
             self.pieceRenderers[piece] = QSvgRenderer("resources/classic-pieces/%s-%s.svg" % (piece.full_color, piece.full_type))
 
     def mousePressEvent(self, e):
-        self.rotation += 20
-        self.repaint()
+        self.dragPosition = e.pos()
+        self.draggedSquare = self.squareAt(e.pos())
+
+    def mouseMoveEvent(self, e):
+        if self.draggedSquare:
+            self.dragPosition = e.pos()
+            self.repaint()
+
+    def mouseReleaseEvent(self, e):
+        if self.draggedSquare:
+            dropSquare = self.squareAt(e.pos())
+            if dropSquare == self.draggedSquare:
+                self.squareClicked.emit(self.draggedSquare)
+            elif dropSquare:
+                self.squareDragDrop.emit(self.draggedSquare, dropSquare)
+            self.draggedSquare = None
+            self.repaint()
 
     def paintEvent(self, event):
         painter = QPainter()
@@ -55,6 +80,7 @@ class Board(QWidget):
         painter.fillRect(QRect(QPoint(0, 0), self.size()), backgroundBrush)
 
         # Do the rotation.
+        painter.save()
         painter.translate(self.width() / 2, self.height() / 2)
         painter.rotate(self.rotation)
 
@@ -116,15 +142,42 @@ class Board(QWidget):
             for y in range(0, 8):
                 square = chess.Square.from_x_and_y(x, 7 - y)
                 piece = self.position[square]
-                if piece:
+                if piece and square != self.draggedSquare:
                     painter.save()
                     painter.translate((x + 0.5) * squareSize, (y + 0.5) * squareSize)
                     painter.rotate(-self.rotation)
                     self.pieceRenderers[piece].render(painter, QRect(-squareSize / 2, -squareSize / 2, squareSize, squareSize))
                     painter.restore()
 
+        # Draw a floating piece.
+        painter.restore()
+        if self.draggedSquare:
+            piece = self.position[self.draggedSquare]
+            if piece:
+                painter.save()
+                painter.translate(self.dragPosition.x(), self.dragPosition.y())
+                painter.rotate(-self.rotation)
+                self.pieceRenderers[piece].render(painter, QRect(-squareSize / 2, -squareSize / 2, squareSize, squareSize))
+                painter.restore()
+
         painter.end()
 
+    def squareAt(self, point):
+        # Undo the rotation.
+        transform = QTransform()
+        transform.translate(self.width() / 2, self.height() / 2)
+        transform.rotate(self.rotation)
+        logicalPoint = transform.inverted()[0].map(point)
+
+        frameSize = min(self.width(), self.height()) * (1 - self.margin * 2)
+        borderSize = min(self.width(), self.height()) * self.padding
+        squareSize = (frameSize - 2 * borderSize) / 8.0
+        x = int(logicalPoint.x() / squareSize + 4)
+        y = 7 - int(logicalPoint.y() / squareSize + 4)
+        try:
+            return chess.Square.from_x_and_y(x, y)
+        except IndexError:
+            return None
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

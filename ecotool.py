@@ -6,6 +6,7 @@ import chess
 import optparse
 import textwrap
 import os
+import json
 
 if __name__ == "__main__":
     # Parse command line arguments.

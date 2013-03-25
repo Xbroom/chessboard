@@ -2105,7 +2105,7 @@ class PgnDatabaseReader(object):
                     self.__current_game[tag_name] = tag_value
                 else:
                     self.games.append(self.__current_game)
-                    self.__movetexts.append(self.__movetext)
+                    self.movetexts.append(self.__movetext)
                     self.__current_game = None
             if not self.__current_game:
                 self.__current_game = GameHeaderBag()

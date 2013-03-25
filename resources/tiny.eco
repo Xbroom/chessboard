@@ -1,0 +1,5 @@
+A00 "Start position"  *
+B00 "King's Pawn"  1.e4 *
+C00 "French"  1.e4 e6 *
+D00 "Queen's Pawn Game"  1.d4 d5 *
+E00 "Queen's Pawn: Neo-Indian"  1.d4 Nf6 2.c4 e6 *

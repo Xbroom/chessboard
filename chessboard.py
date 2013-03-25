@@ -210,7 +210,12 @@ class Board(QWidget):
     def moveFromDragDrop(self, source, target):
         for move in self.position.get_legal_moves():
             if move.source == source and move.target == target:
-                assert not move.promotion # TODO: Allow promotions.
+                if move.promotion:
+                    dialog = PromotionDialog(self.position[move.source].color, self)
+                    if dialog.exec_():
+                        return chess.Move(source, target, dialog.selectedType())
+                else:
+                    return move
                 return move
 
 
@@ -265,8 +270,5 @@ if __name__ == "__main__":
 
     board = Board()
     board.show()
-
-    d = PromotionDialog("w")
-    d.show()
 
     app.exec_()

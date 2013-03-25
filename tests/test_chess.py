@@ -274,11 +274,6 @@ class SquareTestCase(unittest.TestCase):
         self.assertEqual(chess.Square.from_x88(2), chess.Square("c8"))
         self.assertEqual(chess.Square.from_rank_and_file(rank=2, file="g"), chess.Square("g2"))
 
-    def test_iteration(self):
-        """Tests iteration over all squares."""
-        self.assertTrue(chess.Square("h8") in chess.Square.get_all())
-        self.assertTrue(chess.Square("b1") in chess.Square.get_all())
-
 
 class UtilTestCase(unittest.TestCase):
     """Tests utility functions."""

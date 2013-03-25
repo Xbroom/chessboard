@@ -242,13 +242,6 @@ class Square(object):
         """
         return cls("abcdefgh"[x] + "12345678"[y])
 
-    @classmethod
-    def get_all(cls):
-        """:yield: All squares."""
-        for x in range(0, 8):
-            for y in range(0, 8):
-                yield cls.from_x_and_y(x, y)
-
     @property
     def name(self):
         """The algebraic name of the square."""
@@ -1180,16 +1173,17 @@ class Position(object):
             "k": [-17, -16, -15, 1, 17, 16, 15, -1]
         }
 
-        for square in Square.get_all():
+        for x88, piece in enumerate(self.__board):
             # Skip pieces of the opponent.
-            piece = self[square]
             if not piece or piece.color != self.turn:
                 continue
+
+            square = Square.from_x88(x88)
 
             # Pawn moves.
             if piece.type == "p":
                 # Single square ahead. Do not capture.
-                target = Square.from_x88(square.x88 + PAWN_OFFSETS[self.turn][0])
+                target = Square.from_x88(x88 + PAWN_OFFSETS[self.turn][0])
                 if not self[target]:
                     # Promotion.
                     if target.is_backrank():
@@ -1328,10 +1322,10 @@ class Position(object):
             "k": 5
         }
 
-        for source in Square.get_all():
-            piece = self[source]
+        for x88, piece in enumerate(self.__board):
             if not piece or piece.color != color:
                 continue
+            source = Square.from_x88(x88)
 
             difference = source.x88 - square.x88
             index = difference + 119
@@ -1440,8 +1434,9 @@ class Position(object):
             black_has_bishop = self.get_piece_counts("b")["b"] != 0
             if white_has_bishop and black_has_bishop:
                 color = None
-                for square in Square.get_all():
-                    if self[square] and self[square].type == "b":
+                for x88, piece in enumerate(self.__board):
+                    if piece and piece.type == "b":
+                        square = Square.from_x88(x88)
                         if color != None and color != square.is_light():
                             return False
                         color = square.is_light()
@@ -1777,11 +1772,12 @@ class ZobristHasher(object):
         key = 0
 
         # Hash in the board setup.
-        for square in Square.get_all():
-            piece = position[square]
-            if piece:
-                i = "pPnNbBrRqQkK".index(piece.symbol)
-                key ^= self.__random_array[64 * i + 8 * square.y + square.x]
+        for x in range(0, 8):
+            for y in range(0, 8):
+                piece = position[Square.from_x_and_y(x, y)]
+                if piece:
+                    i = "pPnNbBrRqQkK".index(piece.symbol)
+                    key ^= self.__random_array[64 * i + 8 * y + x]
 
         # Hash in the castling flags.
         if position.get_castling_right("K"):

@@ -91,15 +91,47 @@ class GameTableModel(QAbstractTableModel):
                 return section + 1
 
 
+class DatabaseMainWindow(QMainWindow):
+
+    def __init__(self, parent=None):
+        super(DatabaseMainWindow, self).__init__(parent)
+        self.initUi()
+        self.initActions()
+        self.initMenu()
+
+    def initUi(self):
+        self.table = QTableView()
+        self.setCentralWidget(self.table)
+
+        self.setWindowTitle(_("New database"))
+
+    def initActions(self):
+        self.openAction = QAction(_("&Open..."), self)
+        self.openAction.setShortcuts(QKeySequence.Open)
+        self.openAction.setStatusTip(_("Open an existing database"))
+        self.openAction.triggered.connect(self.onOpenAction)
+
+    def initMenu(self):
+        fileMenu = self.menuBar().addMenu(_("&File"))
+        fileMenu.addAction(self.openAction)
+
+    def loadFile(self, filename):
+        reader = chess.PgnDatabaseReader(filename)
+        reader.read_all()
+        self.table.setModel(GameTableModel(reader.games))
+
+    def onOpenAction(self):
+        filename, pattern = QFileDialog.getOpenFileName(self)
+        if filename:
+            self.loadFile(filename)
+
+
 if __name__ == "__main__":
     import chessboard
     import sys
     app = chessboard.ChessboardApplication(sys.argv)
 
-    view = QTableView()
-    reader = chess.PgnDatabaseReader("resources/games/kasparov-deep-blue-1997.pgn")
-    reader.read_all()
-    view.setModel(GameTableModel(reader.games))
-    view.show()
+    window = DatabaseMainWindow()
+    window.show()
 
     app.exec_()

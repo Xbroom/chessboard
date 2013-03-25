@@ -28,20 +28,24 @@ class GameTableModel(QAbstractTableModel):
             if index.column() == 0:
                 return game["White"]
             elif index.column() == 1:
-                return game["WhiteElo"]
+                if "WhiteElo" in game:
+                    return game["WhiteElo"]
             elif index.column() == 2:
                 return game["Black"]
             elif index.column() == 3:
-                return game["BlackElo"]
+                if "BlackElo" in game:
+                    return game["BlackElo"]
             elif index.column() == 4:
                 if game["Result"] == "1/2-1/2":
                     return u"½-½"
                 else:
                     return game["Result"]
             elif index.column() == 5:
-                return game["PlyCount"]
+                if "PlyCount" in game:
+                    return game["PlyCount"]
             elif index.column() == 6:
-                return game["ECO"]
+                if "ECO" in game:
+                    return game["ECO"]
             elif index.column() == 7:
                 return game["Event"]
             elif index.column() == 8:
@@ -52,7 +56,7 @@ class GameTableModel(QAbstractTableModel):
                 return game["Round"]
         elif role == Qt.ToolTipRole:
             if index.column() == 6:
-                if game["ECO"] in self.ecoLookup:
+                if "ECO" in game and game["ECO"] in self.ecoLookup:
                     return self.ecoLookup[game["ECO"]]["name"]
         elif role == Qt.ForegroundRole:
             if index.data(Qt.DisplayRole) == "?":

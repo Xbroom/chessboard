@@ -41,6 +41,11 @@ class GameHeaderBagTestCase(unittest.TestCase):
         self.assertEqual(order[7], "Annotator")
         self.assertEqual(order[8], "Lorem")
 
+    def test_date(self):
+        bag = chess.GameHeaderBag()
+        bag["Date"] = "1995"
+        self.assertEqual(bag["Date"], "1995.??.??")
+
 
 class MoveTestCase(unittest.TestCase):
     """Tests the Move class."""

@@ -1891,7 +1891,7 @@ class GameHeaderBag(collections.MutableMapping):
         iterating over the keys.
     """
 
-    __date_regex = re.compile(r"^(\?{4}|[0-9]{4})\.(\?\?|[0-9]{2})\.(\?\?|[0-9]{2})$")
+    __date_regex = re.compile(r"^(\?{4}|[0-9]{4})(\.(\?\?|[0-9]{2})\.(\?\?|[0-9]{2}))?$")
     __round_regex = re.compile(r"^(\?|[0-9]+)$")
     __time_control_regex = re.compile(r"^([0-9]+)\/([0-9]+):([0-9]+)$")
     __time_regex = re.compile(r"^([0-9]{2}):([0-9]{2}):([0-9]{2})$")
@@ -1959,10 +1959,13 @@ class GameHeaderBag(collections.MutableMapping):
             if not matches:
                 raise ValueError(
                     "Invalid value for Date header: %s." % repr(value))
-            year = matches.group(1) if matches.group(1) != "????" else "2000"
-            month = int(matches.group(2)) if matches.group(2) != "??" else "10"
-            day = int(matches.group(3)) if matches.group(3) != "??" else "1"
-            datetime.date(int(year), int(month), int(day))
+            if not matches.group(2):
+                value = "%s.??.??" % matches.group(1)
+            else:
+                year = matches.group(1) if matches.group(1) != "????" else "2000"
+                month = int(matches.group(2)) if matches.group(3) != "??" else "10"
+                day = int(matches.group(3)) if matches.group(4) != "??" else "1"
+                datetime.date(int(year), int(month), int(day))
         elif key == "Round":
             if not GameHeaderBag.__round_regex.match(value):
                 raise ValueError(

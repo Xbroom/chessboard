@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import collections
+import random
+import re
+
+
 START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 

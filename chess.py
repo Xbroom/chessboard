@@ -1011,10 +1011,9 @@ class Position(object):
         if not color in ["w", "b"]:
             raise KeyError("Invalid color: %s." % repr(color))
 
-        for square in Square.get_all():
-            piece = self[square]
+        for x88, piece in enumerate(self.__board):
             if piece and piece.color == color and piece.type == "k":
-                return square
+                return Square.from_x88(x88)
 
     @property
     def fen(self):

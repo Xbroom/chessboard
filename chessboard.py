@@ -25,6 +25,7 @@ class Board(QWidget):
         self.backgroundPixmap = QPixmap("resources/background.png")
 
         self.position = chess.Position()
+        self.position.make_move(chess.Move.from_uci("e2e4"))
 
         # Load piece set.
         self.pieceRenderers = dict()

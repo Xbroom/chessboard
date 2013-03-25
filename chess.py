@@ -183,7 +183,7 @@ class Square(object):
 
         if not name[1] in ["1", "2", "3", "4", "5", "6", "7", "8"]:
             raise ValueError("Expected rank, got: %s." % repr(name[1]))
-        self.__rank = name[1]
+        self.__rank = int(name[1])
         self.__y = ord(self.__name[1]) - ord("1")
 
         self.__x88 = self.__x + 16 * (7 - self.__y)
@@ -238,6 +238,13 @@ class Square(object):
             An integer between 0 and 7 where 0 is the first rank.
         """
         return cls("abcdefgh"[x] + "12345678"[y])
+
+    @classmethod
+    def get_all(cls):
+        """:yield: All squares."""
+        for x in range(0, 8):
+            for y in range(0, 8):
+                yield cls.from_x_and_y(x, y)
 
     @property
     def name(self):

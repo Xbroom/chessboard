@@ -54,6 +54,13 @@ class GameTableModel(QAbstractTableModel):
             if index.column() == 6:
                 if game["ECO"] in self.ecoLookup:
                     return self.ecoLookup[game["ECO"]]["name"]
+        elif role == Qt.ForegroundRole:
+            if index.data(Qt.DisplayRole) == "?":
+                return QBrush(Qt.gray)
+        elif role == Qt.FontRole:
+            font = QFont()
+            font.setBold(index.column() <= 4)
+            return font
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if role == Qt.DisplayRole:

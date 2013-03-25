@@ -4,10 +4,12 @@ from PySide.QtCore import *
 from PySide.QtGui import *
 
 import chess
+import json
 
 class GameTableModel(QAbstractTableModel):
     def __init__(self, games):
         super(GameTableModel, self).__init__()
+        self.ecoLookup = json.load(open("dist/eco-lookup.json", "r"))
         self.games = games
 
     def rowCount(self, parent):
@@ -48,6 +50,10 @@ class GameTableModel(QAbstractTableModel):
                 return game["Site"]
             elif index.column() == 10:
                 return game["Round"]
+        elif role == Qt.ToolTipRole:
+            if index.column() == 6:
+                if game["ECO"] in self.ecoLookup:
+                    return self.ecoLookup[game["ECO"]]["name"]
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if role == Qt.DisplayRole:

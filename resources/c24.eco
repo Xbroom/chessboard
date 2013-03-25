@@ -1,0 +1,33 @@
+C24 "Bishop's Opening: Berlin Defence"  1.e4 e5 2.Bc4 Nf6 *
+C24 "Bishop's Opening: Greco Gambit"  1.e4 e5 2.Bc4 Nf6 3.f4 *
+C24 "Bishop's Opening: 3.d3"  1.e4 e5 2.Bc4 Nf6 3.d3 *
+C24 "Bishop's Opening: 3.d3 d5"  1.e4 e5 2.Bc4 Nf6 3.d3 d5 *
+C24 "Bishop's Opening: Paulsen Defence"  1.e4 e5 2.Bc4 Nf6 3.d3 c6 *
+C24 "Bishop's Opening: Paulsen, 4.Nf3"  1.e4 e5 2.Bc4 Nf6 3.d3 c6 4.Nf3 *
+C24 "Bishop's Opening: 3.d4"  1.e4 e5 2.Bc4 Nf6 3.d4 *
+C24 "Bishop's Opening: Urusov Gambit"  1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3 *
+C24 "Bishop's Opening: Urusov Gambit, Panov Variation"
+  1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3 d5 5.exd5 Bb4+ 6.c3 Qe7+ *
+C24 "Bishop's Opening: Urusov Gambit, Marshall Variation"
+  1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3 Nxe4 5.Qxd4 Nf6 6.Nc3 Nc6 7.Qh4 *
+C24 "Bishop's Opening: Urusov Gambit, 6.Bg5 Nc6 Defence"
+  1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3 Nxe4 5.Qxd4 Nf6 6.Bg5 Nc6 *
+C24 "Bishop's Opening: Urusov Gambit, 7...c6 Defence"
+  1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3 Nxe4 5.Qxd4 Nf6 6.Bg5 Be7 7.Nc3 c6 *
+C24 "Bishop's Opening: Urusov Gambit, Larsen Variation"
+  1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3 Nxe4 5.Qxd4 Nf6 6.Bg5 Be7 7.Nc3 c6
+  8.O-O-O d5 9.Rhe1 O-O 10.Qh4 *
+C24 "Bishop's Opening: Urusov Gambit, Karpov Variation"
+  1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3 Nxe4 5.Qxd4 Nf6 6.Bg5 Be7 7.Nc3 c6
+  8.O-O-O d5 9.Rhe1 Be6 10.Bd3 Nbd7 11.Qh4 c5 *
+C24 "Bishop's Opening: Urusov Gambit, Forintos/Haag Variation"
+  1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3 Nxe4 5.Qxd4 Nf6 6.Bg5 Be7 7.Nc3 c6
+  8.O-O-O d5 9.Rhe1 Be6 10.Bd3 Nbd7 11.Qh4 Nc5 12. Nd4 Ng8 *
+C24 "Bishop's Opening: Urusov Gambit, 7...Nc6 Defence"
+  1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3 Nxe4 5.Qxd4 Nf6 6.Bg5 Be7 7.Nc3 Nc6 *
+C24 "Bishop's Opening: Urusov Gambit, Keres Variation"
+  1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3 Nxe4 5.Qxd4 Nf6 6.Bg5 Be7 7.Nc3 Nc6
+  8.Qh4 d6 *
+C24 "Bishop's Opening: Urusov Gambit, Estrin Variation"
+  1.e4 e5 2.Bc4 Nf6 3.d4 exd4 4.Nf3 Nxe4 5.Qxd4 Nf6 6.Bg5 Be7 7.Nc3 Nc6
+  8.Qh4 d5 *

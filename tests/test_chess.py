@@ -339,7 +339,7 @@ class PgnDatabaseReaderTestCase(unittest.TestCase):
 
 class EcoFileParserTestCase(unittest.TestCase):
 
-    def test(self):
+    def test_tiny(self):
         parser = chess.EcoFileParser()
         parser.tokenize("resources/tiny.eco")
         parser.read_all()
@@ -350,3 +350,8 @@ class EcoFileParserTestCase(unittest.TestCase):
         position = chess.Position()
         position.make_move(chess.Move.from_uci("e2e4"))
         self.assertEqual(parser.classification[hash(position)]["eco"], "B00")
+
+    def test_c24(self):
+        parser = chess.EcoFileParser()
+        parser.tokenize("resources/c24.eco")
+        parser.read_all()

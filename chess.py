@@ -2142,7 +2142,7 @@ class EcoFileParser(object):
         self.current_name = None
         self.current_position = None
 
-        self.chunks = []
+        self.chunks = collections.deque()
 
     def tokenize(self, filename):
         handle = open(filename, "r")
@@ -2154,7 +2154,7 @@ class EcoFileParser(object):
             self.chunks += line.split()
 
     def read_chunk(self):
-        chunk = self.chunks.pop(0)
+        chunk = self.chunks.popleft()
 
         if self.classification is None and self.lookup is None:
             return

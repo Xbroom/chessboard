@@ -8,6 +8,8 @@ from PySide.QtCore import *
 from PySide.QtGui import *
 from PySide.QtSvg import *
 
+import chess
+
 class Board(QWidget):
 
     def __init__(self, parent=None):
@@ -20,8 +22,15 @@ class Board(QWidget):
         self.borderColor = QColor(100, 100, 200)
         self.shadowWidth = 2
         self.rotation = 0
-        self.renderer = renderer = QSvgRenderer("resources/classic-pieces/black-king.svg")
         self.backgroundPixmap = QPixmap("resources/background.png")
+
+        self.position = chess.Position()
+
+        # Load piece set.
+        self.pieceRenderers = dict()
+        for symbol in "PNBRQKpnbrqk":
+            piece = chess.Piece(symbol)
+            self.pieceRenderers[piece] = QSvgRenderer("resources/classic-pieces/%s-%s.svg" % (piece.full_color, piece.full_type))
 
     def mousePressEvent(self, e):
         self.rotation += 20
@@ -104,11 +113,14 @@ class Board(QWidget):
         # Draw pieces.
         for x in range(0, 8):
             for y in range(0, 8):
-                painter.save()
-                painter.translate((x + 0.5) * squareSize, (y + 0.5) * squareSize)
-                painter.rotate(-self.rotation)
-                self.renderer.render(painter, QRect(-squareSize / 2, -squareSize / 2, squareSize, squareSize))
-                painter.restore()
+                square = chess.Square.from_x_and_y(x, y)
+                piece = self.position[square]
+                if piece:
+                    painter.save()
+                    painter.translate((x + 0.5) * squareSize, (y + 0.5) * squareSize)
+                    painter.rotate(-self.rotation)
+                    self.pieceRenderers[piece].render(painter, QRect(-squareSize / 2, -squareSize / 2, squareSize, squareSize))
+                    painter.restore()
 
         painter.end()
 

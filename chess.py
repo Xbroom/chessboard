@@ -2119,12 +2119,14 @@ class PgnDatabaseReader(object):
                 self.__current_game = GameHeaderBag()
                 self.__current_game[tag_name] = tag_value
                 self.__movetext = ""
+            self.__in_tags = True
         # Add movetext lines.
         else:
             if self.__current_game:
                 self.__movetext += "\n" + line
             else:
                 raise PgnError("Invalid PGN. Expected header before movetext: %s." % repr(line))
+            self.__in_tags = False
 
     def read_all(self):
         while not self.__done:

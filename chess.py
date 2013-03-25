@@ -6,6 +6,7 @@ import re
 import types
 import datetime
 import itertools
+import os
 
 
 START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
@@ -2043,3 +2044,88 @@ class GameHeaderBag(collections.MutableMapping):
             return "FEN" in self
         else:
             return self.__normalize_key(key) in self.__headers
+
+
+class PgnDatabaseReader(object):
+
+    __tag_regex = tag_regex = re.compile(r"\[([A-Za-z0-9]+)\s+\"(.*)\"\]")
+
+    def __init__(self, filename, read_movetexts=False):
+        self.__read_movetexts = read_movetexts
+
+        self.__handle = open(filename, "r")
+        self.__scanned = 0
+        self.__size = os.path.getsize(filename)
+        self.__done = False
+        self.__games = []
+        self.__movetexts = []
+
+        self.__current_game = None
+        self.__in_tags = False
+        self.__movetext = ""
+
+    @property
+    def scanned(self):
+        return self.__scanned
+
+    @property
+    def size(self):
+        return self.__size
+
+    @property
+    def done(self):
+        return self.__done
+
+    @property
+    def games(self):
+        return tuple(self.__games)
+
+    @property
+    def movetexts(self):
+        return tuple(self.__movetexts)
+
+    def read(self):
+        # Check if already done.
+        if self.__done:
+            return
+
+        # Empty string (as opposed to "\n" is the EOF.
+        line = self.__handle.readline()
+        if line == "":
+            if self.__current_game:
+                self.__games.append(self.__current_game)
+                self.__movetexts.append(self.__movetext)
+            self.__done = True
+            return
+
+        # Skip empty lines and comments.
+        line = line.decode("latin-1").strip()
+        if not line or line.startswith("%"):
+            return
+
+        # Check for tag lines.
+        tag_match = PgnDatabaseReader.__tag_regex.match(line)
+        if tag_match:
+            tag_name = tag_match.group(1)
+            tag_value = tag_match.group(2).replace("\\\\", "\\").replace("\\[", "]").replace("\\\"", "\"")
+            if self.__current_game:
+                if self.__in_tags:
+                    self.__current_game[tag_name] = tag_value
+                else:
+                    self.__games.append(self.__current_game)
+                    self.__movetexts.append(self.__movetext)
+                    self.__current_game = None
+            if not self.__current_game:
+                self.__current_game = GameHeaderBag()
+                self.__current_game[tag_name] = tag_value
+                self.__movetext = ""
+        # Add movetext lines.
+        else:
+            if self.__current_game:
+                self.__movetext += "\n" + line
+            else:
+                raise PgnError("Invalid PGN. Expected header before movetext: %s." % repr(line))
+
+    def read_all(self):
+        while not self.__done:
+            self.read()

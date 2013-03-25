@@ -735,7 +735,7 @@ class Position(object):
         if piece.type == "p":
             # En-passant.
             if move.target.file != move.source.file and not capture:
-                if self.turn == "b":
+                if self.turn == "w":
                     self[move.target.x88 - 16] = None
                 else:
                     self[move.target.x88 + 16] = None

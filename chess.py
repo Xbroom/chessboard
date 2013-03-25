@@ -3,6 +3,7 @@
 import collections
 import random
 import re
+import types
 
 
 START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
@@ -187,12 +188,11 @@ class Square(object):
 
         self.__x88 = self.__x + 16 * (7 - self.__y)
 
-    @classmethod
     def __new__(cls, name):
         try:
             return cls.__cache[name]
         except KeyError:
-            cls.__cache[name] = super(cls, self).__new__(cls, name)
+            cls.__cache[name] = super(Square, cls).__new__(cls, name)
             return cls.__cache[name]
 
     @classmethod

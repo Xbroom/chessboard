@@ -113,7 +113,7 @@ class Board(QWidget):
         # Draw pieces.
         for x in range(0, 8):
             for y in range(0, 8):
-                square = chess.Square.from_x_and_y(x, y)
+                square = chess.Square.from_x_and_y(x, 7 - y)
                 piece = self.position[square]
                 if piece:
                     painter.save()

@@ -13,12 +13,6 @@ import chess
 
 class Board(QWidget):
 
-    squareDragStart = Signal(chess.Square)
-
-    squareDragDrop = Signal(chess.Square, chess.Square)
-
-    squareClicked = Signal(chess.Square)
-
     def __init__(self, parent=None):
         super(Board, self).__init__(parent)
         self.margin = 0.1
@@ -45,7 +39,9 @@ class Board(QWidget):
 
     def mousePressEvent(self, e):
         self.dragPosition = e.pos()
-        self.draggedSquare = self.squareAt(e.pos())
+        square = self.squareAt(e.pos())
+        if self.canDragSquare(square):
+            self.draggedSquare = square
 
     def mouseMoveEvent(self, e):
         if self.draggedSquare:
@@ -56,9 +52,11 @@ class Board(QWidget):
         if self.draggedSquare:
             dropSquare = self.squareAt(e.pos())
             if dropSquare == self.draggedSquare:
-                self.squareClicked.emit(self.draggedSquare)
+                self.onSquareClicked(self.draggedSquare)
             elif dropSquare:
-                self.squareDragDrop.emit(self.draggedSquare, dropSquare)
+                move = self.moveFromDragDrop(self.draggedSquare, dropSquare)
+                if move:
+                    self.position.make_move(move)
             self.draggedSquare = None
             self.repaint()
 
@@ -178,6 +176,21 @@ class Board(QWidget):
             return chess.Square.from_x_and_y(x, y)
         except IndexError:
             return None
+
+    def canDragSquare(self, square):
+        for move in self.position.get_legal_moves():
+            if move.source == square:
+                return True
+        return False
+
+    def onSquareClicked(self, square):
+        pass
+
+    def moveFromDragDrop(self, source, target):
+        for move in self.position.get_legal_moves():
+            if move.source == source and move.target == target:
+                assert not move.promotion # TODO: Allow promotions.
+                return move
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

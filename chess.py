@@ -1892,7 +1892,7 @@ class GameHeaderBag(collections.MutableMapping):
     """
 
     __date_regex = re.compile(r"^(\?{4}|[0-9]{4})(\.(\?\?|[0-9]{2})\.(\?\?|[0-9]{2}))?$")
-    __round_regex = re.compile(r"^(\?|[0-9]+)$")
+    __round_part_regex = re.compile(r"^(\?|-|[0-9]+)$")
     __time_control_regex = re.compile(r"^([0-9]+)\/([0-9]+):([0-9]+)$")
     __time_regex = re.compile(r"^([0-9]{2}):([0-9]{2}):([0-9]{2})$")
 
@@ -1967,9 +1967,10 @@ class GameHeaderBag(collections.MutableMapping):
                 day = int(matches.group(4)) if matches.group(4) != "??" else "1"
                 datetime.date(int(year), int(month), int(day))
         elif key == "Round":
-            if not GameHeaderBag.__round_regex.match(value):
-                raise ValueError(
-                    "Invalid value for Round header: %s." % repr(value))
+            parts = value.split(".")
+            for part in parts:
+                if not GameHeaderBag.__round_part_regex.match(part):
+                    raise ValueError("Invalid value for Round header: %s." % repr(value))
         elif key == "Result":
             if not value in ["1-0", "0-1", "1/2-1/2", "*"]:
                 raise ValueError(

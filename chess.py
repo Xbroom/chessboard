@@ -1996,6 +1996,18 @@ class GameHeaderBag(collections.MutableMapping):
                     "Invalid value for Time header: %s." % repr(value))
         elif key == "Termination":
             value = value.lower()
+
+            # Support chess.com PGN files.
+            if value.endswith(" won by resignation"):
+                value = "normal"
+            elif value.endswith(" drawn by repetition"):
+                value = "normal"
+            elif value.endswith(" won by checkmate"):
+                value = "normal"
+            elif value.endswith(" game abandoned"):
+                value = "abandoned"
+
+            # Ensure value matches the PGN standard.
             if not value in ["abandoned", "adjudication", "death", "emergency",
                              "normal", "rules infraction", "time forfeit",
                              "unterminated"]:

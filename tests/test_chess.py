@@ -50,7 +50,7 @@ class GameHeaderBagTestCase(unittest.TestCase):
 
         # With month and day.
         bag["Date"] = "2010.12.10"
-        self.assertEqual(bag["Date"], "2010.12.01")
+        self.assertEqual(bag["Date"], "2010.12.10")
 
 
 class MoveTestCase(unittest.TestCase):

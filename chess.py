@@ -1963,8 +1963,8 @@ class GameHeaderBag(collections.MutableMapping):
                 value = "%s.??.??" % matches.group(1)
             else:
                 year = matches.group(1) if matches.group(1) != "????" else "2000"
-                month = int(matches.group(2)) if matches.group(3) != "??" else "10"
-                day = int(matches.group(3)) if matches.group(4) != "??" else "1"
+                month = int(matches.group(3)) if matches.group(3) != "??" else "10"
+                day = int(matches.group(4)) if matches.group(4) != "??" else "1"
                 datetime.date(int(year), int(month), int(day))
         elif key == "Round":
             if not GameHeaderBag.__round_regex.match(value):

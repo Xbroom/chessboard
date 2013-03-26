@@ -1981,9 +1981,11 @@ class GameHeaderBag(collections.MutableMapping):
             else:
                 value = str(int(value))
         elif key == "TimeControl":
-            if not GameHeaderBag.__time_control_regex.match(value):
-                raise ValueError(
-                    "Invalid value for TimeControl header: %s." % repr(value))
+            pass
+            # TODO: Implement correct parsing.
+            #if not GameHeaderBag.__time_control_regex.match(value):
+            #    raise ValueError(
+            #        "Invalid value for TimeControl header: %s." % repr(value))
         elif key == "Time":
             matches = GameHeaderBag.__time_regex.match(value)
             if (not matches or

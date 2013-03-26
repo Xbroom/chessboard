@@ -43,8 +43,14 @@ class GameHeaderBagTestCase(unittest.TestCase):
 
     def test_date(self):
         bag = chess.GameHeaderBag()
+
+        # Without month and day.
         bag["Date"] = "1995"
         self.assertEqual(bag["Date"], "1995.??.??")
+
+        # With month and day.
+        bag["Date"] = "2010.12.10"
+        self.assertEqual(bag["Date"], "2010.12.01")
 
 
 class MoveTestCase(unittest.TestCase):

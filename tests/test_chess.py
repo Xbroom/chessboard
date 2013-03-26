@@ -52,6 +52,13 @@ class GameHeaderBagTestCase(unittest.TestCase):
         bag["Date"] = "2010.12.10"
         self.assertEqual(bag["Date"], "2010.12.10")
 
+    def test_round(self):
+        bag = chess.GameHeaderBag()
+        bag["Round"] = "1"
+        bag["Round"] = "1.1"
+        bag["Round"] = "?"
+        bag["Round"] = "-"
+
 
 class MoveTestCase(unittest.TestCase):
     """Tests the Move class."""

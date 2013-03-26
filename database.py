@@ -16,7 +16,7 @@ class GameTableModel(QAbstractTableModel):
         return len(self.games)
 
     def columnCount(self, parent):
-        return 11
+        return 12
 
     def index(self, row, column, parent=QModelIndex()):
         return self.createIndex(row, column, self.games[row])
@@ -51,8 +51,11 @@ class GameTableModel(QAbstractTableModel):
             elif index.column() == 8:
                 return game["Date"]
             elif index.column() == 9:
-                return game["Site"]
+                if "Time" in game:
+                    return game["Time"]
             elif index.column() == 10:
+                return game["Site"]
+            elif index.column() == 11:
                 return game["Round"]
         elif role == Qt.ToolTipRole:
             if index.column() == 6:
@@ -88,8 +91,10 @@ class GameTableModel(QAbstractTableModel):
                 elif section == 8:
                     return _("Date")
                 elif section == 9:
-                    return _("Site")
+                    return _("Time")
                 elif section == 10:
+                    return _("Site")
+                elif section == 11:
                     return _("Round")
             else:
                 return section + 1
